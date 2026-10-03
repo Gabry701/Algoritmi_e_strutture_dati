@@ -41,6 +41,29 @@ struct nodeType {
 };
 
 
+link newNode(token_t val, link next);
+void insNewNode(link *h, link *t, token_t val);
+void freeListOfTokens(link h);
+link tokenizeRegexp(char *rgxp, int* nodeCount);
+int compareRegChar(link node, char c);
+char *cercaRegexp(char *src, char *regexp);
+
+
+
+int main(int argc, char *argv[]) {
+    char *src, *regexp, *found;
+    src = argv[1];    
+    regexp = argv[2];
+    found = cercaRegexp(src, regexp);
+    
+    printf("%s", found);
+}
+
+
+
+
+
+
 //funzioni per la gestione della lista
 link newNode(token_t val, link next) {
     link x = malloc(sizeof(*x));
@@ -50,19 +73,25 @@ link newNode(token_t val, link next) {
     return x;
 }
 
-void insNewNode(link *h, token_t val) {
-    link x=*h;
-    if (x == NULL)
-        *h = newNode(val, NULL);
+void insNewNode(link *h, link *t, token_t val) {
+    if (*h == NULL)
+        *h = *t = newNode(val, NULL);
     else {
-        for (; x->next != NULL; x=x->next);
-        x->next = newNode(val, NULL);
+        (*t)->next = newNode(val, NULL);
+        *t = (*t)->next;
     }
+}
+
+void freeListOfTokens(link h) {
+    if (h == NULL) return;
+    freeListOfTokens(h->next);
+    free(h->tk.val);
+    free(h);
 }
 
 
 link tokenizeRegexp(char *rgxp, int* nodeCount) {
-    link head = NULL;
+    link head = NULL, tail = NULL;
     char *p;
     int dimValue;
     BracketType currentBracketType;
@@ -111,7 +140,7 @@ link tokenizeRegexp(char *rgxp, int* nodeCount) {
             token.type = DEFAULT;
             break;
         }
-        insNewNode(&head, token);
+        insNewNode(&head, &tail, token);
         (*nodeCount)++;
     }
     return head;
@@ -159,28 +188,13 @@ char *cercaRegexp(char *src, char *regexp) {
             matchCount = 0;
         }
     }
-    //aggiustare questo
-    // for (link x = head; x->next != NULL; x = x->next) {
-    //     free(x);
-    //     free(x->tk.val);
-    // }
-    // free(head);
+    freeListOfTokens(head);
 
     if (matchCount >= len) {
         solution[len] = '\0';
         return solution;
     }
-    
+    free(solution);
     return NULL;
 }
 
-int main(int argc, char *argv[]) {
-    char *src, *regexp, *found;
-    src = argv[1];    
-    regexp = argv[2];
-    found = cercaRegexp(src, regexp);
-    
-    
-    
-    printf("%s", found);
-}
