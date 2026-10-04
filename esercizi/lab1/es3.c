@@ -47,7 +47,6 @@ void eseguiComando(Comando richiesta, Corsa *pCorse[], int nCorse);
 void stampaVettoreCorse(Corsa *c[], int n);
 void ordinaVettore(Corsa *v[], int n, char cond);
 void ricercaPartenza(Corsa *pCorse[], int nCorse, char *x);
-void eseguiComando(Comando richiesta, Corsa *pCorse[], int nCorse);
 
 
 
@@ -157,15 +156,15 @@ int bubbleSortCorse(Corsa *v[], int n, char cond) {
                     break;
                 case 'c':
                     if (strcmp(v[j]->codice, v[j+1]->codice)>0)
-                        swap = 1;
+                    swap = 1;
                     break;
                 case 'p':
                     if (strcmp(v[j]->partenza,v[j+1]->partenza)>0)
-                        swap = 1;
+                    swap = 1;
                     break;
                 case 'a':
                 if (strcmp(v[j]->destinazione, v[j+1]->destinazione)>0)
-                        swap = 1;
+                    swap = 1;
                     break;
                 default:
                     return 0;
