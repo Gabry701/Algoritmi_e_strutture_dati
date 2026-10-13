@@ -9,9 +9,10 @@ int fattoriale(int n) {
 int fibonacci(int n) {
     if (n == 0)
         return n;
-    return fibonacci(n-2) + fibonacci(n-1)
+    return fibonacci(n-2) + fibonacci(n-1);
 }
 
 int main() {
     printf("%d", fattoriale(5));
 }
+
