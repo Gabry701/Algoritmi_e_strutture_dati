@@ -94,7 +94,7 @@ void stampaCorsa(Corsa c, FILE *fp) {
     fprintf(fp, "%s %s %s %d/%02d/%02d %02d:%02d:%02d %02d:%02d:%02d %d\n",
         c.codice, c.partenza, c.destinazione,
         c.data.anno, c.data.mese, c.data.giorno,
-        c.oraPartenza.ora, c.oraPartenza.minuti, c.oraArrivo.secondi,
+        c.oraPartenza.ora, c.oraPartenza.minuti, c.oraPartenza.secondi,
         c.oraArrivo.ora, c.oraArrivo.minuti, c.oraArrivo.secondi,
         c.ritardo );   
 }
@@ -206,7 +206,7 @@ void ricercaPartenza(Corsa *pCorse[], int nCorse, char *x) {
         count = 0;
         for (int j = 0; j < lenX; j++) {
             //toupper completamente superfluo ma già che lo abbiamo nativo in c usiamolo
-            if (toupper(*(current + j)) == toupper(x[j]) || (*(current + j) == '_' && x[i] == ' ')) 
+            if (toupper(*(current + j)) == toupper(x[j]) || (*(current + j) == '_' && x[j] == ' ')) 
                 count++;
         }
         if (count == lenX)
