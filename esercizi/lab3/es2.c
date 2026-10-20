@@ -1,5 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define MAX_LEN_WORD 50
+#define MAX_LEN_CODE 5
+#define MAX_FILE_LINE (4*MAX_LEN_WORD + 2*MAX_LEN_CODE + 8 + 7)
 
 typedef enum {r_keyboardIn, r_fileIn, r_searchCode, r_delSingle, r_delInterval, r_exportList} Comando;
 
@@ -11,13 +16,13 @@ typedef struct {
 } Data;
 
 typedef struct {
-    char codice[6];
-    char nome[51];
-    char cognome[51];
+    char codice[MAX_LEN_CODE + 1];
+    char nome[MAX_LEN_WORD + 1];
+    char cognome[MAX_LEN_WORD + 1];
     Data dataNascita;
-    char via[51];
-    char citta[51];
-    char cap[6];
+    char via[MAX_LEN_WORD + 1];
+    char citta[MAX_LEN_WORD + 1];
+    char cap[MAX_LEN_CODE + 1];
 } Persona;
 
 typedef struct node Node, *link;
@@ -29,13 +34,16 @@ struct node {
 link newNode(Persona val, link next);
 void addNode(link *h, Persona val);
 int ageGreaterThan(Data a, Data b);
-void readPersona(FILE *fp, Persona *p);
+int readPersona(char *s, Persona *p);
 Comando getRequest();
 void executeRequest(Comando req, link *h);
 void printList(link h);
 void keyboardIn_exe(link *h);
-
+void fileIn_exe(link *h);
 //FINITO PUNTO 1, FARE PUNTO 2, FUNZIONE PER INPUT DA FILE GIÀ PRONTA
+
+void search_
+
 
 void executeRequest(Comando req, link *h) {
     switch (req) {
@@ -43,7 +51,7 @@ void executeRequest(Comando req, link *h) {
         keyboardIn_exe(h);
         break;
     case r_fileIn:
-        //fileIn_exe();
+        fileIn_exe(h);
         break;
     case r_searchCode:
         //keyboardIn_exe();
@@ -84,12 +92,14 @@ link newNode(Persona val, link next) {
 void addNode(link *h, Persona val) {
     link p, x;
     for (x = *h; x != NULL; x = x->next)
-        if (x->val.codice == val.codice) 
+        if (strcmp(x->val.codice, val.codice) == 0) 
             return;
-    if (*h == NULL || ageGreaterThan((*h)->val.dataNascita, val.dataNascita))
+    if (*h == NULL || ageGreaterThan((*h)->val.dataNascita, val.dataNascita)) {
         *h = newNode(val, *h);
-    for (x = (*h)->next, p = *h; x != NULL && ageGreaterThan(x->val.dataNascita, p->val.dataNascita); p = x, x = x->next)
-        p->next = newNode(val,x);
+        return;
+    }
+    for (x = (*h)->next, p = *h; x != NULL && ageGreaterThan(val.dataNascita, x->val.dataNascita); p = x, x = x->next);
+        p->next = newNode(val, x);
 }
 
 //helpers
@@ -102,17 +112,19 @@ int ageGreaterThan(Data a, Data b) {
             return 1;
         if (a.mese == b.mese && a.giorno > b.giorno)
             return 1;
-    }                
+    }
     return 0;
 }
 
 // uso void passando il puntatore per risparmiare memoria (copia solo il puntatore, non l'intera struct)
-void readPersona(FILE *fp, Persona *p) {
+int readPersona(char *s, Persona *p) {
     //specifichiamo i caratteri massimi che possiamo avere nella stringa per evitare buffer overflow
-    fscanf(fp, "%5s", p->codice);
-    fscanf(fp, "%50s %50s", p->nome, p->cognome);
-    fscanf(fp, "%d/%d/%d", &(p->dataNascita.giorno), &(p->dataNascita.mese), &(p->dataNascita.anno));
-    fscanf(fp, "%50s %50s %5s", p->via, p->citta, p->cap);
+    return sscanf(s, "%5s %50s %50s %d/%d/%d %50s %50s %5s",
+        p->codice,
+        p->nome, p->cognome,
+        &(p->dataNascita.giorno), &(p->dataNascita.mese), &(p->dataNascita.anno),
+        p->via, p->citta, p->cap
+    ) == 9;
 }
 
 void printList(link h) {
@@ -123,7 +135,7 @@ void printList(link h) {
         printf("Codice: %s\n", x->val.codice);
         printf("Nome: %s\n", x->val.nome);
         printf("Cognome: %s\n", x->val.cognome);
-        printf("Data di nascita: %0d/%0d/%0d\n", x->val.dataNascita.giorno, x->val.dataNascita.mese, x->val.dataNascita.anno);
+        printf("Data di nascita: %02d/%02d/%d\n", x->val.dataNascita.giorno, x->val.dataNascita.mese, x->val.dataNascita.anno);
         printf("Via: %s\n", x->val.via);
         printf("Citta': %s\n", x->val.citta);
         printf("Cap': %s\n", x->val.cap);
@@ -148,6 +160,27 @@ void keyboardIn_exe(link *h) {
     printf("- Citta': "); scanf("%50s", person.citta);
     printf("- Cap': "); scanf("%5s", person.cap);
     addNode(h, person);
+}
+
+void fileIn_exe(link *h) {
+    Persona current;
+    FILE *fp;
+    char filename[31];
+    char line[MAX_FILE_LINE + 1];
+    printf("\nInserire il nome del file da cui prendere i dati: "); 
+    scanf("%30s", filename);
+    printf("\n\n");
+    fp = fopen(filename, "r");
+    if (fp == NULL) {
+        printf("|ERRORE: File non aperto correttamente|\n");
+        return;
+    }
+    while (fgets(line, MAX_FILE_LINE +1, fp) != NULL) {
+        if(readPersona(line, &current)) {
+            addNode(h, current);
+        }
+    }
+    fclose(fp);
 }
 
 // program flow
