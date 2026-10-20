@@ -165,7 +165,7 @@ Persona delSingle_exe(link *h) {
     char code[6];
     Persona deleted;
     printf("Inserire il codice da eliminare: ");
-    scanf("%s", code);
+    scanf("%5s", code);
     deleted = delRecord(h, code);
     // qui si possono aggiungere condizioni o passare 
     //per reference un flag nonTrovato così da evitare
@@ -184,7 +184,7 @@ Persona *delInterval_exe(link *h) {
     printf("\nInserisci la seconda data: ");
     scanf("%d/%d/%d", &data2.giorno, &data2.mese, &data2.anno);
     printf("\n");
-    if (h == NULL)
+    if (*h == NULL)
         return NULL;
     for (x = h; (*x)->next != NULL; x = &((*x)->next), c++) {
         if (first && (dataGT(data1, (*x)->val.dataNascita) || dataEq(data1, (*x)->val.dataNascita))) {
