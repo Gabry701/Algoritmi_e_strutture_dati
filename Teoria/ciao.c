@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <item.h>
+#include "item.h"
 
 void mergeSort(Item A[], Item B[], int N);
 static void mergeSort_impl(Item A[], Item B[], int l, int r);

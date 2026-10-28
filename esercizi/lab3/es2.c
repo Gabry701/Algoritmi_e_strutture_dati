@@ -77,7 +77,7 @@ Comando getRequest() {
 }
 
 void executeRequest(Comando req, link *h) {
-    Persona *deleted;
+    Persona *deleted = NULL;
     switch (req) {
     case r_keyboardIn:
         keyboardIn_exe(h);
@@ -91,11 +91,17 @@ void executeRequest(Comando req, link *h) {
         searchCode_exe(h);
         break;
     case r_delSingle:
-        delSingle_exe(h);
+        //assegnazioni a scopo dimostrativo, in realtà
+        // sarebbe meglio separare il vettore dei dati eliminati
+        // dal dato eliminato singolo o aggiungere il dato singolo 
+        // a un unico vettore mallocato (ed eventualmente reallocato)
+        // che contiene tutti gli elementi eliminati
+        *deleted = delSingle_exe(h);
         break;
     case r_delInterval:
         deleted = delInterval_exe(h);
-        free(deleted);
+        // qui si possono inserire le funzioni che operano sui
+        // record eliminati
         break;
     case r_exportList:
         exportList_exe(h);
@@ -104,6 +110,9 @@ void executeRequest(Comando req, link *h) {
         printf("Programma terminato");
         break;
     }
+    // se non si devono fare operazioni con deleted
+    // fuori dalla funzione
+    free(deleted);
 }
 
 //execute command functions 

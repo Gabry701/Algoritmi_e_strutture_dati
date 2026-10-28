@@ -39,6 +39,7 @@ int majority_impl(int *a, int l, int r, int *excess);
 
 
 int main() {
+    //vettore di esempio, testato su vari vettori
     int v[9] = {1, 2, 1, 12, 1, 3, 1, 5, 1};
     majority(v,9);
 }
