@@ -146,8 +146,7 @@ int powerset_r(int pos, int *val, int *sol, int k, int start, int cnt) {
 int powerset_d(int pos, int *val, int *sol, int k, int cnt)
 {
     int j;
-    if (pos >= k)
-    {
+    if (pos >= k) {
         printf("{\t");
         for (j = 0; j < k; j++)
             if (sol[j] != 0)
@@ -155,6 +154,7 @@ int powerset_d(int pos, int *val, int *sol, int k, int cnt)
         printf("} \n");
         return cnt + 1;
     }
+
     sol[pos] = 0;
     cnt = powerset_d(pos + 1, val, sol, k, cnt);
     sol[pos] = 1;
@@ -174,8 +174,7 @@ int powerset_c(int *val, int k, int *sol) {
     //POWERSET CON COMBINAZIONI SEMPLICI (IMPLEMENTATION)
     int powerset_impl(int *val, int k, int *sol, int j, int pos,  int start) {
         int cnt = 0, i;
-        if (pos >= k)
-        {
+        if (pos >= k) {
             printf("{\t");
             for (i = 0; i < j; i++)
                 if (sol[i] != 0)

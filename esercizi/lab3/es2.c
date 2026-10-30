@@ -33,6 +33,7 @@ struct node {
 
 link newNode(Persona val, link next);
 void addNode(link *h, Persona val);
+void freeList(link h);
 int dataGT(Data a, Data b);
 int dataEq(Data a, Data b);
 int readPersona(char *s, Persona *p);
@@ -59,6 +60,7 @@ int main() {
         executeRequest(request, &head);
         printList(head);
     } while (request < 6 && request >= 0);
+    freeList(head);
 }
 
 // program flow
@@ -96,6 +98,7 @@ void executeRequest(Comando req, link *h) {
         // dal dato eliminato singolo o aggiungere il dato singolo 
         // a un unico vettore mallocato (ed eventualmente reallocato)
         // che contiene tutti gli elementi eliminati
+        deleted = malloc(sizeof(Persona));
         *deleted = delSingle_exe(h);
         break;
     case r_delInterval:
@@ -116,6 +119,9 @@ void executeRequest(Comando req, link *h) {
 }
 
 //execute command functions 
+// ho provato a usare implementazioni _exe per ogni singolo comando
+// lasciando la funzione request senza codice aggiuntivo a parte quello necessario
+// per il return
 
 void keyboardIn_exe(link *h) {
     Persona person;
@@ -177,7 +183,7 @@ Persona delSingle_exe(link *h) {
     scanf("%5s", code);
     deleted = delRecord(h, code);
     // qui si possono aggiungere condizioni o passare 
-    //per reference un flag nonTrovato così da evitare
+    // per reference un flag nonTrovato così da evitare
     // messaggi nell'uso della deleted returnata se è vuota
     // es: if(strlen(deleted.codice)==0) nonTrovato = 0;
     return deleted;
@@ -186,7 +192,7 @@ Persona delSingle_exe(link *h) {
 Persona *delInterval_exe(link *h) {
     Persona *deletedArray;
     Data data1, data2;
-    link *x, *y, tmp, *start;
+    link *x, *y, tmp, *start = h;
     int first = 1, c = 0, i;
     printf("Inserisci la prima data: "); 
     scanf("%d/%d/%d", &data1.giorno, &data1.mese, &data1.anno);
@@ -259,6 +265,33 @@ void addNode(link *h, Persona val) {
         p->next = newNode(val, x);
 }
 
+void printList(link h) {
+    link x;
+    int c = 1;
+    for (x = h; x != NULL; x = x->next, c++) {
+        printf("===== Nodo %d =====\n", c);
+        printf("Codice: %s\n", x->val.codice);
+        printf("Nome: %s\n", x->val.nome);
+        printf("Cognome: %s\n", x->val.cognome);
+        printf("Data di nascita: %02d/%02d/%d\n", x->val.dataNascita.giorno, x->val.dataNascita.mese, x->val.dataNascita.anno);
+        printf("Via: %s\n", x->val.via);
+        printf("Citta': %s\n", x->val.citta);
+        printf("Cap': %s\n", x->val.cap);
+        printf("\n");
+    }
+}
+
+// leggermente superflua dato che la lista è presente in tutto il programma 
+// e la lista viene deallocata automaticamente alla chiusura
+void freeList(link h) {
+    link x, p;
+    for (x = h; x != NULL; x = p) {
+        p = x->next;
+        free(x);
+    }
+}
+
+
 //helpers
 
 
@@ -301,21 +334,6 @@ int readPersona(char *s, Persona *p) {
     ) == 9;
 }
 
-void printList(link h) {
-    link x;
-    int c = 1;
-    for (x = h; x != NULL; x = x->next, c++) {
-        printf("===== Nodo %d =====\n", c);
-        printf("Codice: %s\n", x->val.codice);
-        printf("Nome: %s\n", x->val.nome);
-        printf("Cognome: %s\n", x->val.cognome);
-        printf("Data di nascita: %02d/%02d/%d\n", x->val.dataNascita.giorno, x->val.dataNascita.mese, x->val.dataNascita.anno);
-        printf("Via: %s\n", x->val.via);
-        printf("Citta': %s\n", x->val.citta);
-        printf("Cap': %s\n", x->val.cap);
-        printf("\n");
-    }
-}
 
 Persona delRecord(link *h, char *k) {
     link *x, t;

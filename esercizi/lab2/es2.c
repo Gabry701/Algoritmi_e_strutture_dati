@@ -5,6 +5,9 @@
 
 int **malloc2dR(char *filename, int *nr, int *nc);
 void separa(int **mat, int nr, int nc, int **vBianche, int **vNere, int *nNere, int *nBianche);
+
+
+
 int main(int argc, char *argv[]) {
     int nr, nc;
     int **mat;
@@ -54,7 +57,8 @@ void separa(int **mat, int nr, int nc, int **vBianche, int **vNere, int *nNere, 
                 (*vBianche)[b++] = mat[i][j];
             else
                 (*vNere)[n++] = mat[i][j];
-            isWhite = !isWhite;
+            if (!(nc % 2 == 0 && j == nc-1))
+                isWhite = !isWhite;
         }
     }
 }

@@ -76,12 +76,13 @@ int leggiFileCorse(Corsa v[]) {
     fscanf(fp, "%d", &numCorse);
     for (int i = 0; i < numCorse; i++) {
         //fscanf separati per leggibilità
-        fscanf(fp, "%s %s %s", &v[i].codice, &v[i].partenza, &v[i].destinazione);
+        fscanf(fp, "%s %s %s", v[i].codice, v[i].partenza, v[i].destinazione);
         fscanf(fp, "%d/%d/%d", &v[i].data.anno, &v[i].data.mese, &v[i].data.giorno);
         fscanf(fp, "%d:%d:%d", &v[i].oraPartenza.ora, &v[i].oraPartenza.minuti, &v[i].oraPartenza.secondi);
         fscanf(fp, "%d:%d:%d", &v[i].oraArrivo.ora, &v[i].oraArrivo.minuti, &v[i].oraArrivo.secondi);
         fscanf(fp, "%d", &v[i].ritardo);
     }
+    fclose(fp);
     return numCorse;
 }
 
@@ -127,12 +128,12 @@ int confrontaDate(Corsa a, Corsa b) {
     //returna 1 se data a > data b
    int dataA, dataB;
    int orarioA, orarioB;
-   dataA = a.data.anno*1e4 + a.data.mese*1e2 + a.data.giorno;
-   dataB = b.data.anno*1e4 + b.data.mese*1e2 + b.data.giorno;
+   dataA = a.data.anno*10000 + a.data.mese*100 + a.data.giorno;
+   dataB = b.data.anno*10000 + b.data.mese*100 + b.data.giorno;
    if (dataA > dataB)  return 1;
    if (dataA == dataB) {
-        orarioA = a.oraPartenza.ora*1e4 + a.oraPartenza.minuti*1e2 + a.oraPartenza.secondi;
-        orarioB = b.oraPartenza.ora*1e4 + b.oraPartenza.minuti*1e2 + b.oraPartenza.secondi;
+        orarioA = a.oraPartenza.ora*10000 + a.oraPartenza.minuti*100 + a.oraPartenza.secondi;
+        orarioB = b.oraPartenza.ora*10000 + b.oraPartenza.minuti*100 + b.oraPartenza.secondi;
         if (orarioA > orarioB) return 1;
    }
    return 0;
@@ -177,6 +178,7 @@ int bubbleSortCorse(Corsa *v[], int n, char cond) {
             }
         }
     }
+    return 1;
 }
 
 
@@ -203,7 +205,7 @@ void ricercaPartenza(Corsa *pCorse[], int nCorse, char *x) {
     for (int i = 0; i < nCorse; i++) {
         current = pCorse[i]->partenza;
         count = 0;
-        for (int j = 0; j < lenX; j++) {
+        for (int j = 0; j < lenX && *(current+j) != '\0'; j++) {
             //toupper completamente superfluo ma già che lo abbiamo nativo in c usiamolo
             if (toupper(*(current + j)) == toupper(x[j]) || (*(current + j) == '_' && x[j] == ' ')) 
                 count++;
@@ -240,8 +242,6 @@ void eseguiComando(Comando richiesta, Corsa *pCorse[], int nCorse) {
     case r_stampaFile:
         printf("inserire il nome del file con l'estensione (massimo 20 caratteri, default: corseOut.txt): ");
         scanf("%s", nomeFile);
-        if (nomeFile[0] == '\0') 
-            strcpy(nomeFile, "corseOut.txt");
         fp = fopen(nomeFile, "w");
         for (int i = 0; i < nCorse; i++)
             stampaCorsa(*pCorse[i], fp);

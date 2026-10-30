@@ -45,7 +45,7 @@ typedef struct {
 
 //AGGIUNGERE PARAMETRO DI ORDINATO NELLE FUNZIONI DI ORDINAMENTO E ALLOCARE MEMORIA
 Comando registraComando();
-int leggiFileCorse(Corsa **v, Corsa ***refV, char *filename, int toFree);
+int leggiFileCorse(Corsa **v, Corsa ***refV, char *filename);
 int bubbleSortCorse(Corsa *v[], int n, char cond);
 int confrontaDate(Corsa a, Corsa b);
 int ricercaDicotomicaCodice(Corsa *v[], int l, int r, char *x);
@@ -54,7 +54,7 @@ void eseguiComando(Comando richiesta, Corsa **corse, Corsa ***pCorse, int *pnCor
 void stampaVettoreCorse(Corsa *c[], int n);
 void ordinaVettore(Corsa ***v, Corsa *refCorse[], int n, char cond);
 void ricercaPartenza(Corsa *pCorse[], int nCorse, char *x);
-
+void freeArrays(Corsa **v, Corsa ***refV, Ordinato *ord);
 
 
 
@@ -64,25 +64,20 @@ int main() {
     int numeroCorse;
     Comando richiestaUtente = 0;
     Ordinato orderedArrays = {NULL, NULL, NULL, NULL};
-    numeroCorse = leggiFileCorse(&corse, &refCorse, DEFAULT_FILENAME, 0);
+    numeroCorse = leggiFileCorse(&corse, &refCorse, DEFAULT_FILENAME);
     printf("%d", numeroCorse);
     
     do {
         richiestaUtente = registraComando();
         eseguiComando(richiestaUtente, &corse, &refCorse, &numeroCorse, &orderedArrays);
-    } while (richiestaUtente >= 0);
+    } while (richiestaUtente >= 0 && richiestaUtente <= 8);
 }
 
 
 
-int leggiFileCorse(Corsa **v, Corsa ***refV, char *filename, int toFree) {
+int leggiFileCorse(Corsa **v, Corsa ***refV, char *filename) {
     FILE *fp;
     int numCorse;
-
-    if (toFree) {
-        free(*v);
-        free(*refV);
-    }
     fp = fopen(filename, "r");
     fscanf(fp, "%d", &numCorse);
     *v = malloc(numCorse*sizeof(Corsa));
@@ -116,9 +111,6 @@ void stampaCorsa(Corsa c, FILE *fp) {
 
 Comando registraComando() {
     Comando usrPrompt = -1;
-    //dato che nel 3 non è specificato il metodo in cui l'utente deve specificare 
-    //l'operazione da attuare, scelgo di implementare un elenco puntato che, a livello di
-    //ux per una applicazione del genere mi sembra più chiaro e fruibile all'utente 
     printf("======================== SCEGLIERE IL COMANDO DA ESEGUIRE ========================\n");
     printf("    0. Cambia file\n");
     printf("    1. Stampa a video dei contenuti\n");
@@ -132,7 +124,6 @@ Comando registraComando() {
     printf("\nINSERIRE IL COMANDO DA ESEGUIRE: ");
     scanf("%d", &usrPrompt);
     printf("\n");
-    //returno il numero scelto -1 in quanto gli indici degli enum iniziano da 0 mentre il mio elenco da 1
     return usrPrompt;
 }
 
@@ -249,6 +240,18 @@ int ricercaDicotomicaCodice(Corsa *v[], int l, int r, char *x) {
     return ricercaDicotomicaCodice(v, c+1, r, x);
 }
 
+void freeArrays(Corsa **v, Corsa ***refV, Ordinato *ord) {
+    // dalla documentazione di C, free(NULL) non fa niente, quindi posso anche
+    // evitare di controllare che i vettori siano stati allocati (con i comandi di ordinamento)
+    // dato che nel main sono inizializzati a NULL
+        free(*v); *v = NULL;
+        free(*refV); *refV = NULL;
+        free(ord->data);     ord->data = NULL;
+        free(ord->partenza); ord->partenza = NULL;
+        free(ord->arrivo);   ord->arrivo = NULL;
+        free(ord->codice);   ord->codice = NULL;   
+} 
+
 
 void eseguiComando(Comando richiesta, Corsa **corse, Corsa ***pCorse, int *pnCorse, Ordinato *ordType) {
     int nCorse = *pnCorse;
@@ -258,7 +261,8 @@ void eseguiComando(Comando richiesta, Corsa **corse, Corsa ***pCorse, int *pnCor
     switch (richiesta) {
     case r_cambiaFile:
         scanf("%s", nomeFile);
-        *pnCorse = leggiFileCorse(corse, pCorse, nomeFile, 1);
+        freeArrays(corse, pCorse, ordType);
+        *pnCorse = leggiFileCorse(corse, pCorse, nomeFile);
         printf("%d", *pnCorse);
         printf("file letto con successo\n");
         break;
@@ -269,8 +273,6 @@ void eseguiComando(Comando richiesta, Corsa **corse, Corsa ***pCorse, int *pnCor
         nomeFile[0] = '\0';
         printf("inserire il nome del file con l'estensione (massimo 20 caratteri, default: corseOut.txt): ");
         scanf("%s", nomeFile);
-        if (nomeFile[0] == '\0') 
-            strcpy(nomeFile, "corseOut.txt");
         fp = fopen(nomeFile, "w");
         for (int i = 0; i < nCorse; i++)
             stampaCorsa((*corse)[i], fp);
