@@ -1,104 +1,76 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define filename "grafo.txt"
 
-typedef struct vertici_s {
-    int *vAssociati;
-    int numAssociati;
-} Vertice;
-
-
-
-int leggiGrafo(Vertice **v, char *filename, int *numArchi) {
-    FILE *fp;
-    int nVertici, nArchi;
+typedef struct arco_s {
     int v1, v2;
+} Arco;
+
+
+
+Arco *leggiGrafo(int *N, int *E);
+int vertexCover(Arco *archi, int N, int E);
+int vertexCover_impl(Arco *archi, int N, int E, int *sol, int j, int pos, int start);
+
+int main() {
+    int nArchi, nVertici;
+    Arco *archi;
+    archi = leggiGrafo(&nVertici, &nArchi);
+    vertexCover(archi, nVertici, nArchi);
+}
+
+Arco *leggiGrafo (int *N, int *E) {
+    FILE *fp;
+    Arco *archi;
     fp = fopen(filename, "r");
     if (fp == NULL) {
         printf("errore nell'apertura del file");
-        return EXIT_FAILURE;
+        return NULL;
     }
-    fscanf(fp, "%d %d", &nVertici, &nArchi);
-    *v = malloc(nVertici*sizeof(Vertice));
-    for (int i = 0; i < nVertici; i++) {
-        (*v)->vAssociati = malloc(nArchi*sizeof(int));
-        (*v)->numAssociati = 0;
-    }
-    for (int i = 0; i < nArchi; i++) {
-        if (fscanf(fp, "%d %d", &v1, &v2) == 2) {
-            (*v)[v1].vAssociati[(*v)[v1].numAssociati++] = v2;
-            (*v)[v2].vAssociati[(*v)[v2].numAssociati++] = v1;
-        }
-    }
+    fscanf(fp, "%d %d", N, E);
+    archi = malloc((*E)*sizeof(Arco));
+    for (int i = 0; i < *E; i++) 
+        fscanf(fp, "%d %d", &archi[i].v1, &archi[i].v2);
     fclose(fp);
-    return nVertici;
+    return archi;
 }
 
 
-int elementNotInArray(int el, int *v, int k) {
-    int count = 0;
-    for (int i = 0; i < k; i++)
-        if (el != v[k]) count++;
-    if (count == k)
-        return 1;
-    return 0;
-}
-
-
-int isCompletedSet(Vertice *val, int *sol, int lenSol, int N) {
-    int i;
-    int seen[N];
-    int completed = 0, count = 0;
-    for (int i = 0; i < lenSol; i++) {
-        for (int j = 0; j < val[sol[i]].numAssociati; j++)
-            for (int k = 0; k < count; k++)
-                if (val[sol[i]].vAssociati[j] == seen[k]) {
-                    seen[count++] = val[sol[i]].vAssociati[j];
-                    if (count == N) return 1;
-                }
-    }
-    return 0;
-}
-
-
-int powersetFiltered(Vertice *val, int k, int *sol, int j, int pos, int start) {
-    int cnt = 0, i;
-    if (pos >= k) {
-        if (isCompletedSet(val, sol, pos, k)) {
-            printf("{");
-            for (i = 0; i < j; i++)
-                    printf("%d\t", i);
-            printf("}\n");
-        }
-        return 1;
-    }
-    for (i = start; i < k; i++) {
-        sol[pos] = i;
-        cnt += powersetFiltered(val, k, sol, j, pos+1, i+1);
-    }
-    return cnt;
-}
-
-
-
-int vertexCover(Vertice *val, int k, int *sol) {
-    int cnt = 0;
-    sol = malloc(k*sizeof(int));
-    for (int j = 0; j <= k; j++)
-        cnt += powersetFiltered(val, k, sol, j, 0, 0);
-    return cnt;
-}
-
-
-
-int main(int argc, char *argv[]) {
-    Vertice *grafo;
-    char *filename = argv[1];
+int vertexCover(Arco *archi, int N, int E) {
+    int cnt = 0, j;
     int *sol;
-    int N;
-    if ((N = leggiGrafo(&grafo, filename, sol)) == 0)
-        return EXIT_FAILURE;
-    vertexCover(grafo, N, sol);
+    sol = malloc(E*sizeof(int));
+    for (j = 0; j <= E; j++) {
+        cnt += vertexCover_impl(archi, N, E, sol, j, 0, 0);
+    }
+    free(sol);
+    return cnt;
+}
 
-    
+int vertexCover_impl(Arco *archi, int N, int E, int *sol, int j, int pos, int start) {
+    int cnt = 0, i, included = 0;
+    if (pos >= j) {
+        for (i = 0; i < E; i++) {
+            for (int k = 0; k < j; k++) {
+                if (archi[i].v1 == sol[k] || archi[i].v2 == sol[k]) {
+                    included += 1;
+                    break;
+                }
+            }
+        }
+        if (included == E) {
+            printf("{ ");
+            for (i = 0; i < j; i++)
+                    printf("%d ", sol[i]);
+            printf("} \n");
+            return 1;
+        }
+        return 0;
+    }
+    for (i = start; i < N; i++) {
+        sol[pos] = i;
+        cnt += vertexCover_impl(archi, N, E, sol, j, pos+1, i+1);
+    }
+    return cnt;
 }

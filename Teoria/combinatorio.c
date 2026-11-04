@@ -163,28 +163,28 @@ int powerset_d(int pos, int *val, int *sol, int k, int cnt)
 }
 
 //POWERSET CON COMBINAZIONI SEMPLICI (WRAPPER)
-int powerset_c(int *val, int k, int *sol) {
+int powerset_c(int *val, int n, int *sol) {
     int cnt = 0, j;
     printf("{}\n");
     cnt++;
-    for (j = 1; j <= k; j++)
-        cnt = powerset_impl(val, k, sol, j, 0, 0);
+    for (j = 1; j <= n; j++)
+        cnt += powerset_impl(val, n, sol, j, 0, 0);
     return cnt;
 }
     //POWERSET CON COMBINAZIONI SEMPLICI (IMPLEMENTATION)
-    int powerset_impl(int *val, int k, int *sol, int j, int pos,  int start) {
+    int powerset_impl(int *val, int n, int *sol, int j, int pos,  int start) {
         int cnt = 0, i;
-        if (pos >= k) {
+        if (pos >= j) {
             printf("{\t");
             for (i = 0; i < j; i++)
                 if (sol[i] != 0)
-                    printf("%d \t", val[i]);
+                    printf("%d \t", sol[i]);
             printf("} \n");
             return 1;
         }
-        for (i= start; i < k; i++) {
+        for (i= start; i < n; i++) {
             sol[pos] = val[i];
-            cnt += powerset_impl(val, k, sol, j, pos+1, i+1);
+            cnt += powerset_impl(val, n, sol, j, pos+1, i+1);
         }
             return cnt;
     }
