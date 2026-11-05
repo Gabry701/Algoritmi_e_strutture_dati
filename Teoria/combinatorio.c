@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+typedef struct {int *scelte; int n_scelte; } Livello;
+
 int disp(int pos, int *val, int *sol, int *mark, int n, int k, int cnt);
 int dispRip(int pos, int *val, int *sol, int n, int k, int cnt);
 int perm(int pos, int *val, int *sol, int *mark, int n, int cnt);
@@ -12,7 +14,7 @@ int powerset_c(int *val, int k, int *sol);
 int powerset_impl(int *val, int k, int *sol, int j, int pos, int start);
 void SP_rec(int n,int m,int pos,int *sol,int *val);
 void SP_rec_all(int n, int k, int m, int pos, int *sol, int *val);
-
+int princ_molt(int pos, Livello *val, int *sol,int n, int cnt);
 
 int main() {
     int val[4] = {4, 9, 1, 0};
@@ -21,6 +23,20 @@ int main() {
     
 }
 
+int princ_molt(int pos, Livello *val, int *sol, int n, int cnt) {
+    int i;
+    if (pos >= n) {
+        for (i = 0; i < n; i++)
+            printf("%d ", sol[i]);
+        printf("\n");
+        return cnt+1;
+    }
+        for (i = 0; i < val[pos].n_scelte; i++) {
+            sol[pos] = val[pos].scelte[i];
+            cnt = princ_molt(pos+1, val, sol, n, cnt);
+    }
+    return cnt;
+}
 
 //DISPOSIZIONI SEMPLICI
 int disp(int pos, int *val, int *sol, int *mark, int n, int k, int cnt) {
