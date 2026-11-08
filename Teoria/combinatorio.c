@@ -104,7 +104,7 @@ int permRip(int pos, int *val, int *sol, int *mark, int n, int cnt) {
             mark[i]--;
             sol[pos] = val[i];
             cnt = permRip(pos+1, val, sol, mark, n, cnt);
-            mark[i]--;
+            mark[i]++;
         }
     }
     return cnt;
