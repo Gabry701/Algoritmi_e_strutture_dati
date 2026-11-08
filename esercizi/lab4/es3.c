@@ -69,6 +69,7 @@ int test(Pietra v[], int N, char *filename, char exeType) {
             else
                 len = collanaOpt(v, N);
     }
+    fclose(fp);
     return 1;
 }
 
