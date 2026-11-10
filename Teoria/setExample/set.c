@@ -1,5 +1,5 @@
 #include "set.h"
-
+#include <stdlib.h>
 
 static int min(int a, int b);
 

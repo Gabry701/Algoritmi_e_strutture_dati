@@ -1,18 +1,20 @@
 #ifndef ITEM_H
 #define ITEM_H
 
-#include <stdio.h>
+typedef struct item *Item;
+typedef char *Key;
 
-#define maxKey 100
-
-typedef int Item;
-
-Item ITEMscan(void);
-int ITEMeq(Item A, Item B);
-int ITEMneq(Item A, Item B);
-int ITEMlt(Item A, Item B);
-int ITEMgt(Item A, Item B);
-void ITEMshow(Item A);
-Item ITEMrand(void);
+Key KEYget(Item val);
+Key KEYscan();
+int KEYcompare(Key k1, Key k2);
+Item ITEMnew();
+void ITEMfree(Item val);
+Item ITEMscan();
+void ITEMshow(Item val);
+int ITEMless(Item val1, Item val2);
+int ITEMgreater(Item val1, Item val2);
+int ITEMeq(Item val1, Item val2);
+int ITEMcheckvoid(Item val);
+Item ITEMsetvoid();
 
 #endif

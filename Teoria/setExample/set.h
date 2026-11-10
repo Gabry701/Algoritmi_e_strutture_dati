@@ -1,7 +1,7 @@
 #ifndef SET_H
 #define SET_H
 
-#include "item.h"
+#include "..\item.h"
 
 
 typedef struct set *SET;

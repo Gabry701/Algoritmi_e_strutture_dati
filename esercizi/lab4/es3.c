@@ -68,7 +68,7 @@ int test(Pietra v[], int N, char *filename, char exeType) {
                 len = collana(v, N);
             else
                 len = collanaOpt(v, N);
-    }
+    }    
     fclose(fp);
     return 1;
 }
@@ -98,6 +98,7 @@ int collana(Pietra* val, int N) {
         printf("%c ", sol[i]);
   }
   printf("\n\n");
+  free(sol);
   return len+1;
 }
 
@@ -231,6 +232,7 @@ int collanaOpt(Pietra* val, int N) {
             printf("%c ", sol[i]);
     }
     printf("\n\n");
+    free(sol);
     return pos;
 }
 
