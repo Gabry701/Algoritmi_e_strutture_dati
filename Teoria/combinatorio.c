@@ -206,7 +206,7 @@ int powerset_c(int *val, int n, int *sol) {
     }
 
 //ALGORITMO DI ER TRA IN (1,n)
-void SP_rec(int n,int m,int pos,int *sol,int *val) {
+void SP_rec(int n,int m,int pos, int *sol,int *val) {
     int i, j;
     if (pos >= n) {
         printf("partizione in %d blocchi: ", m);
@@ -228,7 +228,7 @@ void SP_rec(int n,int m,int pos,int *sol,int *val) {
     SP_rec(n, m+1, pos+1, sol, val);
 }
 
-//ALGORITMO DI ER PER TUTTE LE PARTIZIONI
+//ALGORITMO DI ER PER LE PARTIZIONI DI UN INSIEME CON NUMERO DI BLOCCHI UGUALE A k
 void SP_rec_all(int n, int k, int m, int pos, int *sol, int *val) {
     int i, j;
     if (pos >= n) {
