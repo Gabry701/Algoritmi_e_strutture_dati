@@ -11,6 +11,7 @@ typedef struct att_s
 {
     int s, f;
 } att;
+
 int powerset(att *val, int n, att *current, att *maxSol, int maxDurata, int j, int pos, int start, int *len);
 int readAtt(att **v, char *filename);
 void attSel(int N, att *V);
@@ -23,9 +24,6 @@ int main (int argc, char *argv[]) {
     att *activities;
     N = readAtt(&activities, argv[1]);
     attSel(N, activities);
-    // for (int i = 0; i < N; i++) {
-    //     printf("%d %d\n", activities[i].s, activities[i].f);
-    // }
 }
 int readAtt(att **v, char *filename) {
     FILE *fp;
