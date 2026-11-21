@@ -324,6 +324,10 @@ void PGequip(char *id, char *itemName) {
         printf("Non esiste un personaggio con quel codice\n");
         return;
     }
+    if (x->pg->equip.numEquip == MAX_EQUIP) {
+        printf("Il personaggio non può equipaggiare altri oggetti\n");
+        return;
+    }
     x->pg->equip.items[x->pg->equip.numEquip] = toEquip;
     x->pg->equip.numEquip++;
     x->pg->currentStats.hp += INVgetHp(toEquip);
@@ -332,7 +336,7 @@ void PGequip(char *id, char *itemName) {
     x->pg->currentStats.def += INVgetDef(toEquip);
     x->pg->currentStats.mag += INVgetMag(toEquip);
     x->pg->currentStats.spr += INVgetSpr(toEquip);
-    printf("Arma equipaggiata\n");
+    printf("Oggetto equipaggiato\n");
 }
 
 void PGunequip(char *id, char *itemName) {
@@ -350,7 +354,7 @@ void PGunequip(char *id, char *itemName) {
             break;
         }
     if (toEquip == NULL) {
-        printf("Oggetto non presente nell'inventario\n");
+        printf("Oggetto non equipaggiato\n");
         return;
     }
     
@@ -365,7 +369,7 @@ void PGunequip(char *id, char *itemName) {
     x->pg->currentStats.def -= INVgetDef(toEquip);
     x->pg->currentStats.mag -= INVgetMag(toEquip);
     x->pg->currentStats.spr -= INVgetSpr(toEquip);
-    printf("Arma rimossa\n");
+    printf("Oggetto rimosso\n");
 }
 
 static void freeNode(link x) {

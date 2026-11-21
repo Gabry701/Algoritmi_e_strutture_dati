@@ -23,7 +23,9 @@ int main (int argc, char *argv[]) {
     int N; 
     att *activities;
     N = readAtt(&activities, argv[1]);
+    if (N == -1) return 1;
     attSel(N, activities);
+    free(activities);
 }
 int readAtt(att **v, char *filename) {
     FILE *fp;

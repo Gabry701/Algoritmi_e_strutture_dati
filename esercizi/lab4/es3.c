@@ -6,8 +6,9 @@ COME UTILIZZARE IL PROGRAMMA:
     del calcolo combinatorio. L'esercizio non specifica di "implementare" un modello combinatorio
     ma dice di identificarlo, perciò, dato che la prima stesura del programma implementava un modello
     di calcolo combinatorio (permutazioni con ripetizione), lo lascio come opzione per l'utente.
-    Dati i tempi di calcolo molto superiori della versione ottimizzata (che sfrutta, tra le altre
-    cose, l'indicazione di trovare una SINGOLA soluzione) ho deciso di lasciarla nel programma.
+    Dati i tempi di calcolo molto inferiori della versione ottimizzata (che sfrutta, tra le altre
+    cose, l'indicazione di trovare una SINGOLA soluzione) rispetto a quella combinatoria, 
+    ho deciso di tenere, quindi, entrambe le funzioni.
     Pertanto, l'esecuzione del programma farà uso di flag passati in argv[]:
     Esecuzione: E03 <file.txt> -c oppure E03 <file.txt> -o
     -c sta per combinatorio, ossia il programma userà la funzione combinatoria implementata.
@@ -37,22 +38,20 @@ typedef struct pietra_s {
 int permRipPietre(int pos, Pietra* val, char* sol, char* currentMax, int n, char last, int len, int maxLen);
 int collana(Pietra* val, int N);
 int isValidPietra(char prev, char current);
-void swap(Pietra *a, Pietra *b);
 int test(Pietra v[], int N, char *filename, char exeType);
 int collanaOpt(Pietra* val, int N);
 
 int main(int argc, char *argv[]) {
     Pietra pietre[NUM_TIPI];
     test(pietre, NUM_TIPI, argv[1], argv[2][1]);
-     
 }
 
 
 int test(Pietra v[], int N, char *filename, char exeType) {
     FILE *fp;
     int testNum, len;
-    Pietra temp;
     fp = fopen(filename, "r");
+    if (fp == NULL) return -1;
     fscanf(fp, "%d", &testNum);
     for (int i = 1; i <= testNum; i++) {
             printf("Test #%d\n", i);
@@ -73,12 +72,7 @@ int test(Pietra v[], int N, char *filename, char exeType) {
     return 1;
 }
 
-void swap(Pietra *a, Pietra *b) {
-    Pietra temp;
-    temp = *a;
-    *a = *b;
-    *b = temp;    
-}
+
 
 
 int collana(Pietra* val, int N) {
@@ -99,7 +93,8 @@ int collana(Pietra* val, int N) {
   }
   printf("\n\n");
   free(sol);
-  return len+1;
+  free(cMax);
+  return len;
 }
 
 int permRipPietre(int pos, Pietra* val, char* sol, char* currentMax, int n, char last, int len, int maxLen) {
@@ -162,7 +157,7 @@ int collanaOpt(Pietra* val, int N) {
         printf("\n");
         return val[max].quantity;
     }
-    // caso |r| != 0 && |t| == 0
+    // caso |r| > 0 && |t| > 0
     if (val[0].quantity > 0 && val[1].quantity > 0) {
         if (val[0].quantity > val[1].quantity) 
             max = 0;
@@ -210,7 +205,7 @@ int collanaOpt(Pietra* val, int N) {
     //inserisci un topazio/rubino se si può
     if (val[end].quantity > 0) {
         // ora basta alternare r e t finchè uno dei 2 non finisce
-        for (pos; pos < totPietre; pos++, insertMiddle = !insertMiddle) {
+        for (; pos < totPietre; pos++, insertMiddle = !insertMiddle) {
             if (val[middle].quantity == 0 && insertMiddle)
                 break;
             if (val[end].quantity == 0 && !insertMiddle)

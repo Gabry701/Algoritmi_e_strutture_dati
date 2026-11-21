@@ -8,13 +8,6 @@
 #define INV_FILE "inventario.txt"
 #define OPTIONS_NUM 8
 #define MAX_STR 51
-// caricamento iniziale
-// coordinamento operazioni
-// deallocazione
-
-/*
-TERMINARE PROGRAMMA LIBERANDO STRUTTURE DATI
-*/
 
 typedef enum {r_printPGs, r_printINV, r_printSpecificPG, r_addPG, r_delPG, r_equipPG, r_uneqipPG, r_exit} req;
 

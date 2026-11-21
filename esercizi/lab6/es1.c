@@ -20,7 +20,6 @@ void swap(att *v, int i, int j);
 int partition(att *v, int l, int r);
 void quickSort(att *v, int l, int r);
 int *compatibleActivities(att *v, int N);
-att max(att a, att b);
 int dur(att a);
 int *maxDurata(att *v, int *q, int n);
 void displayBestSol(att *v, int n);
@@ -30,6 +29,7 @@ int main (int argc, char *argv[]) {
     att *activities;
 
     N = readAtt(&activities, argv[1]);
+    if (N == -1) return 1;
     displayBestSol(activities, N);
     free(activities);
 }
@@ -46,7 +46,7 @@ void displayBestSol(att *v, int n) {
     // crescente
     while (i >= 1) {
         if (sommeDurate[i-1] != sommeDurate[i]) {
-            printf("(%d %d)", v[i].s, v[i].f);
+            printf("(%d %d) ", v[i].s, v[i].f);
             i = q[i];
         } else i--;
     }
@@ -66,7 +66,6 @@ int *maxDurata(att *v, int *q, int n) {
             opt[i] = opt[q[i]] + dur(v[i]);
     }
     printf("Durata massima: %d\n", opt[n]);
-    free(q);
     return opt;
 }
 
@@ -88,10 +87,6 @@ int *compatibleActivities(att *v, int N) {
 
 int dur(att a) {
     return a.f - a.s;
-}
-
-att max(att a, att b) {
-    return (dur(a) > dur(b))? a : b;
 }
 
 
@@ -136,7 +131,7 @@ int readAtt(att **v, char *filename) {
     fscanf(fp, "%d\n", &nAtt);
     // farle iniziare da 1 è più comodo
     // lascio in v[0] un elemento con s = 0, f = 0 => dur = 0
-    *v = calloc(sizeof(att), nAtt+1);
+    *v = calloc(nAtt+1, sizeof(att));
     for (int i = 1; i <= nAtt; i++) 
         fscanf(fp, "%d %d\n", &((*v)[i].s), &((*v)[i].f));
     fclose(fp);

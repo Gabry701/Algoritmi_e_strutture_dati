@@ -17,7 +17,9 @@ int main() {
     int nArchi, nVertici;
     Arco *archi;
     archi = leggiGrafo(&nVertici, &nArchi);
+    if (archi == NULL) return 1;
     vertexCover(archi, nVertici, nArchi);
+    free(archi);
 }
 
 Arco *leggiGrafo (int *N, int *E) {
@@ -40,8 +42,8 @@ Arco *leggiGrafo (int *N, int *E) {
 int vertexCover(Arco *archi, int N, int E) {
     int cnt = 0, j;
     int *sol;
-    sol = malloc(E*sizeof(int));
-    for (j = 0; j <= E; j++) {
+    sol = malloc(N*sizeof(int));
+    for (j = 0; j <= N; j++) {
         cnt += vertexCover_impl(archi, N, E, sol, j, 0, 0);
     }
     free(sol);

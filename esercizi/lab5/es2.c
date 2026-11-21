@@ -7,13 +7,14 @@
 
 typedef struct segmento_s
 {
-    char color;
     int score;
+    char color;
 } segmento;
 
-//purtroppo usa padding in più ma penso che 3byte per tile siano sacrificabili per 
+//purtroppo usa padding in più ma penso che un 6 byte per tile siano sacrificabili per 
 // mantenere l'astrazione più ordinata
 typedef struct tile_s {
+    int id, isRot;
     segmento v, h;
 } tile, **board;
 
@@ -23,23 +24,31 @@ tile nullTile();
 tile *getTiles(int *N, char *filename);
 board buildBoard(int *r, int *c, char *filename, tile *tiles);
 void showBoard(board b, int r, int c);
-void showTile(tile t);
 int isNullTile(tile t);
 int getScore(board b, int r, int c);
 int getBestSolution(int pos, board val, board sol, tile *t, int *mark, int maxScore, int r, int c, int n);
-int bestBoard(board b, int r, int c, tile *t, int n);
+void bestBoard(board b, int r, int c, tile *t, int n);
+void freeBoard(board b, int r);
+void showTilesInBoard(board b, int r, int c);
 
 int main() {
     tile *tiles;
     board b;
     int nTiles, r, c;
     tiles = getTiles(&nTiles, TILES_FILE);
+    if (tiles == NULL) return 1;
     b = buildBoard(&r, &c, BOARD_FILE, tiles);
-
+    if(b == NULL) return 1;
     bestBoard(b, r, c, tiles, nTiles);
+    free(tiles);
+    freeBoard(b, r);
 }
 
-
+void freeBoard(board b, int r) {
+    for (int i = 0; i < r; i++)
+        free(b[i]);
+    free(b);
+}
 
 
 
@@ -53,7 +62,6 @@ int getBestSolution(int pos, board val, board sol, tile *t, int *mark, int maxSc
                 for (j = 0; j < c; j++)
                     sol[i][j] = val[i][j];
             maxScore = currentScore;
-            printf("%d", maxScore);
         }
         return maxScore;
     }
@@ -77,38 +85,40 @@ int getBestSolution(int pos, board val, board sol, tile *t, int *mark, int maxSc
     return maxScore;
 }
 
-int bestBoard(board b, int r, int c, tile *t, int n) {
+void bestBoard(board b, int r, int c, tile *t, int n) {
     board sol;
-    int max = -1, count = 0;
+    int max = -1;
     int *mark;
-    mark = calloc(sizeof(int), 2*n);
+    mark = calloc(n, sizeof(int));
     sol = malloc(r*sizeof(*sol));
     for (int i = 0; i < r; i++) {
         sol[i] = malloc(c*sizeof(tile));
     }
     for (int i = 0; i < r; i++)
-        for (int j = 0; j < c; j++) {
+        for (int j = 0; j < c; j++) 
             sol[i][j] = b[i][j];
-        }
     max = getBestSolution(0, b, sol, t, mark, max, r, c, n);
     printf("Massimo punteggio ottenibile: %d\n", max);
     printf("Ecco una tabella con tale punteggio:\n");
     showBoard(sol, r, c);
+    printf("Ecco i tiles presenti nella scacchiera, con formato id/rot :\n");
+    showTilesInBoard(sol, r, c);
+    freeBoard(sol, r);
+    free(mark);
+}
+
+void showTilesInBoard(board b, int r, int c) {
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++)
+            printf("[%d/%d]   ", b[i][j].id, b[i][j].isRot);
+        printf("\n");
+    }
 }
 
 
 
 
 
-
-
-void showTile(tile t) {
-      printf("| %c | ", t.v.color);
-        printf("\n");
-        printf("|%c %d|  ", t.h.color, t.h.score);
-        printf("\n");
-        printf("| %d |  ", t.v.score);
-}
 
 void showBoard(board b, int r, int c) {
     for (int i = 0; i < r; i++) {
@@ -139,10 +149,9 @@ void showBoard(board b, int r, int c) {
 
 
 int getScore(board b, int r, int c) {
-    int score = 0, partialScore, equalColor = 0;
+    int score = 0, partialScore;
     for (int i = 0; i < r; i++) {
         partialScore = 0;
-        equalColor = 0;
         for (int j = 0; j < c; j++) {
             if (j > 0 && b[i][j].h.color != b[i][j-1].h.color) {
                 partialScore = 0;
@@ -154,7 +163,6 @@ int getScore(board b, int r, int c) {
     }
     for (int j = 0; j < c; j++) {
         partialScore = 0;
-        equalColor = 0;
         for (int i = 0; i < r; i++) {
             if (i > 0 && b[i][j].v.color != b[i-1][j].v.color) {
                 partialScore = 0;
@@ -172,6 +180,7 @@ tile rot(tile t) {
     s = t.v;
     t.v = t.h;
     t.h = s;
+    t.isRot = 1;
     return t;
 }
 
@@ -183,6 +192,7 @@ tile nullTile() {
     tile t;
     t.v.color = t.h.color = '\0';
     t.v.score = t.h.score = -1;
+    t.id = t.isRot = -1;
     return t;
 }
 
@@ -197,6 +207,8 @@ tile *getTiles(int *N, char *filename) {
         fscanf(fp, " %c %d %c %d",
             &(tiles[i].h.color), &(tiles[i].h.score),
             &(tiles[i].v.color), &(tiles[i].v.score) );
+            tiles[i].isRot = 0;
+            tiles[i].id = i;
     }
     fclose(fp);
     return tiles;
@@ -220,8 +232,9 @@ board buildBoard(int *r, int *c, char *filename, tile *tiles) {
             else {
                 if (isRot == 0)
                     b[i][j] = tiles[id];
-                else
+                else {
                     b[i][j] = rot(tiles[id]);
+                }
                 tiles[id] = nullTile();
             }
       

@@ -29,6 +29,7 @@ struct inventory_s {
     int numItems;
 };
 
+// anche qui ritengo che l'approccio quasi ADT sia meglio
 
 static Inv inventory;
 
@@ -78,6 +79,7 @@ Item INVgetItem (char *name) {
     for (int i = 0; i < inventory.numItems; i++)
         if (strcmp(name, inventory.items[i]->name) == 0)
             return inventory.items[i];
+    return NULL;
 }
 
 
